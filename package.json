@@ -12,6 +12,7 @@
   "dependencies": {
     "express": "^4.15.2",
     "mysql": "^2.16.0",
+    "random-location": "^1.0.12",
     "socket.io": "^2.1.1"
   }
 }

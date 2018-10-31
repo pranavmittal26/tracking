@@ -3,9 +3,13 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
+    <script src="https://maps.googleapis.com/maps/api/js?key=">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.dev.js"></script>
     <title>Simple Polylines</title>
     <style>
-     
+    
       #map {
         height: 100%;
       }
@@ -15,46 +19,52 @@
         padding: 0;
       }
     </style>
-    <script src="/socket.io/socket.io.js"></script>
-  
   </head>
   <body>
     <div id="map"></div>
+    <div>
+        <button type ="sunmit" id ="track" onclick="track()">TRACK</button>
+    </div>
     <script>
-  var socket = io();
+        let socket = io.connect();
+        var map;
+        var bounds = new google.maps.LatLngBounds();
+        var flightPlanCoordinates = [];
       function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
+          console.log('in map........')
+         map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 3,
+          center: {lat: 0, lng: -180},
+          mapTypeId: 'terrain'
+        });      
+      } 
+      function track(){
+        socket.emit('get track')
+      } 
+      socket.on('send track',(data)=>{
+        flightPlanCoordinates = [];
+        map = new google.maps.Map(document.getElementById('map'), {
           zoom: 3,
           center: {lat: 0, lng: -180},
           mapTypeId: 'terrain'
         });
-
-        var flightPlanCoordinates = [
-          // {lat: 37.772, lng: -122.214},
-          // {lat: 21.291, lng: -157.821},
-          // {lat: -18.142, lng: 178.431},
-          // {lat: -27.467, lng: 153.027}
-        ];
-        socket.on('coordinates', function(array){
-          for(var i=0;i<array.length;i++){
-            flightPlanCoordinates.push(array[i]);
-          }
-        });
-        
-        var flightPath = new google.maps.Polyline({
+          for(i=0;i<data.length;i++){
+              bounds.extend(new google.maps.LatLng(data[i].latitude, data[i].longitude))
+              flightPlanCoordinates.push({lat:Number(data[i].latitude),lng:Number(data[i].longitude)});
+          } 
+          console.log('the data is....',flightPlanCoordinates);
+          var flightPath = new google.maps.Polyline({
           path: flightPlanCoordinates,
           geodesic: true,
           strokeColor: '#FF0000',
           strokeOpacity: 1.0,
           strokeWeight: 2
         });
-
         flightPath.setMap(map);
-        
-      }
+        map.fitBounds(bounds);
+      })
+      initMap();
     </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=YourAPIKey&callback=initMap">
-    </script>
+    
   </body>
 </html>
