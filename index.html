@@ -39,9 +39,9 @@
         });      
       } 
       function track(){
-        socket.emit('get track')
+        socket.emit('track')
       } 
-      socket.on('send track',(data)=>{
+      socket.on('send',(data)=>{
         flightPlanCoordinates = [];
         map = new google.maps.Map(document.getElementById('map'), {
           zoom: 3,
@@ -52,7 +52,6 @@
               bounds.extend(new google.maps.LatLng(data[i].latitude, data[i].longitude))
               flightPlanCoordinates.push({lat:Number(data[i].latitude),lng:Number(data[i].longitude)});
           } 
-          console.log('the data is....',flightPlanCoordinates);
           var flightPath = new google.maps.Polyline({
           path: flightPlanCoordinates,
           geodesic: true,

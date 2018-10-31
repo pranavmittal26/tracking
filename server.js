@@ -17,15 +17,15 @@ app.use(express.static(__dirname));
 
 io.sockets.on('connection',function(socket){
 
-    socket.on('get track',()=>{
+    socket.on('track',()=>{
         location=[];
-        const P = {
+        const coord = {
             latitude: 30.7333,
             longitude: 76.7794
           }
-        const R = 1000; // in meters
+        const dis = 100; // in meters
         for(i=0;i<5;i++){
-            let randomPoint = randomLocation.randomCircumferencePoint(P, R);
+            let randomPoint = randomLocation.randomCircumferencePoint(coord, dis);
             location.push(randomPoint);       
         }
         socket.emit('send track',location);    
